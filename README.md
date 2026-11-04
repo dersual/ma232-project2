@@ -25,7 +25,10 @@ pip install -r requirements.txt
 
 3. Run calculations:
 ```bash
-python calculate.py
+python calculate.py  
+
+# if you need raw latex output for the report, run: 
+python calculate.py --latex
 ```
 
 ## Compiling the Report (`main.tex`)
