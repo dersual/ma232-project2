@@ -1,0 +1,386 @@
+\documentclass[11pt]{article}
+
+% ---------- Packages ----------
+\usepackage[margin=1in]{geometry}
+\usepackage[parfill]{parskip}
+\usepackage{amsmath, amssymb}
+\setcounter{MaxMatrixCols}{20}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+
+% ---------- Title & Authors ----------
+\title{\textbf{MA 232 Course Project 2:}\\ How AI Detects Objects: A Linear Algebra Approach to Pattern Recognition}
+\author{Derrick Sual \and Ryan Kropac \and Mahanth Chintha}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\textit{“I pledge my honor that I have abided by the Stevens Honor System.”}
+\end{center}
+
+\vspace{1em}
+
+% ===========================================================================
+\section*{Part A: Convert the Pattern into a Vector}
+% Assigned to: Derrick Sual
+% ===========================================================================
+
+% --- Task A.1: Convert the given grid into a vector w in R^16 ---
+\subsubsection*{Task A.1: Target Grid and Vector Representation}
+\textit{Convert the given grid into a vector $w \in \mathbb{R}^{16}$.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+The target pattern is a $4 \times 4$ binary grid with blue cells as $1$ and white cells as $0$:
+
+\begin{center}
+\begin{tikzpicture}[scale=0.65]
+  % Grid base
+  \draw[step=1cm, black, thick] (0, 0) grid (4, 4);
+  % Fill the 8 blue cells
+  % Row 1 (top): cells at cols 0, 1, 3
+  \fill[blue!75] (0, 3) rectangle (1, 4);
+  \fill[blue!75] (1, 3) rectangle (2, 4);
+  \fill[blue!75] (3, 3) rectangle (4, 4);
+  % Row 2: cell at col 2
+  \fill[blue!75] (2, 2) rectangle (3, 3);
+  % Row 3: cells at cols 0, 3
+  \fill[blue!75] (0, 1) rectangle (1, 2);
+  \fill[blue!75] (3, 1) rectangle (4, 2);
+  % Row 4 (bottom): cells at cols 0, 2
+  \fill[blue!75] (0, 0) rectangle (1, 1);
+  \fill[blue!75] (2, 0) rectangle (3, 1);
+  % Redraw outlines on top
+  \draw[step=1cm, black, thick] (0, 0) grid (4, 4);
+\end{tikzpicture}
+\end{center}
+
+Reading row by row from top to bottom (left to right) yields the target vector $w \in \mathbb{R}^{16}$:
+\[
+w = \begin{bmatrix}
+1 & 1 & 0 & 1 & 0 & 0 & 1 & 0 & 1 & 0 & 0 & 1 & 1 & 0 & 1 & 0
+\end{bmatrix}^T
+\]
+
+\vspace{0.8em}
+
+% --- Task A.2: Blue and white cell count ---
+\subsubsection*{Task A.2: Cell Counts}
+\textit{How many blue cells and white cells does the target pattern contain?}
+
+\vspace{0.4em}
+\textbf{Answer:}
+The target pattern contains \textbf{8 blue cells} (value 1) and \textbf{8 white cells} (value 0), for a total of 16 cells.
+
+\vspace{0.5em}
+
+% --- Task A.3: Arbitrary blue-and-white grid representation ---
+\subsubsection*{Task A.3: General Pattern Encoding Procedure}
+\textit{Explain how an arbitrary blue-and-white $4 \times 4$ grid can be represented by a vector $u \in \{0, 1\}^{16}$.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+We can treat the $4 \times 4$ grid like a coordinate system where each cell has a row $i$ and column $j$ (from 1 to 4). Each cell takes a value of $1$ if it is filled with blue, or $0$ if it is white.
+
+To flatten this into a vector, we read the grid row by row from top to bottom (left to right) into a 16-element column vector $u \in \{0, 1\}^{16}$. Because there are 16 cells and each cell can be either 0 or 1, this vector representation accounts for all $2^{16} = 65,536$ possible blue-and-white patterns.
+
+\vspace{1.5em}
+
+% ===========================================================================
+\section*{Part B: Construct a Matrix for Pattern Recognition}
+% Assigned to: Derrick Sual
+% ===========================================================================
+
+% --- Task B.1: Information represented by vector u ---
+\subsubsection*{Task B.1: Information Represented by Vector $u$}
+\textit{Explain what information is represented by the vector $u$.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+The vector $u \in \{0, 1\}^{16}$ represents any $4 \times 4$ test pattern we want to check against our target pattern. Each of the 16 entries in $u$ tells us whether that specific box on the grid is blue ($1$) or white ($0$).
+
+\vspace{0.8em}
+
+% --- Task B.2: Role of quadratic form ---
+\subsubsection*{Task B.2: Role of Quadratic Form $Q(u) = u^T M u$}
+\textit{Describe the role of the quadratic form $Q(u) = u^T M u$ in recognizing a pattern.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+The quadratic form $Q(u) = u^T M u$ works like a scoring function for any test pattern $u$:
+\begin{itemize}
+    \item If the function returns $0$, the test pattern matches our target pattern ($Q(w) = w^T M w = 0$).
+    \item If the function returns a nonzero (positive) score, the pattern is not the target pattern ($Q(u) \neq 0$).
+\end{itemize}
+This turns pattern recognition into a simple check: an input pattern is recognized as the target pattern if and only if $Q(u) = 0$.
+
+\vspace{0.5em}
+
+% --- Task B.3: Construct 16x16 matrix M ---
+\subsubsection*{Task B.3: Construction of Matrix $M$}
+\textit{Construct a $16 \times 16$ matrix $M$ that satisfies the two conditions: $w^T M w = 0$ and $u^T M u \neq 0$ for every other nonzero binary vector $u \neq w$.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+We construct $M$ in the form $M = B^T B$. To guarantee that $M w = \mathbf{0}$, we choose the rows of $B$ to be 15 vectors $v_1, \dots, v_{15}$ that are all perpendicular (orthogonal) to $w$.
+
+\begin{enumerate}
+    \item Setting the dot product $w \cdot v = 0$ using our target vector gives:
+    \[
+    v_1 + v_2 + v_4 + v_7 + v_9 + v_{12} + v_{13} + v_{15} = 0
+    \]
+    \item Solving for the first component:
+    \[
+    v_1 = -(v_2 + v_4 + v_7 + v_9 + v_{12} + v_{13} + v_{15})
+    \]
+    Setting each of the other 15 free components to 1 (one at a time, with all others 0) produces a basis of 15 vectors $\{v_1, v_2, \dots, v_{15}\}$ that are all orthogonal to $w$.
+    \item We stack these 15 vectors as rows of a $15 \times 16$ matrix $B$:
+    \[
+    B = \begin{bmatrix} v_1^T \\ v_2^T \\ \vdots \\ v_{15}^T \end{bmatrix}
+    \]
+    \item We set $M = B^T B$, which produces our $16 \times 16$ matrix.
+\end{enumerate}
+
+\vspace{0.8em}
+
+% --- Task B.4: Show w^T M w = 0 ---
+\subsubsection*{Task B.4: Verification of the Null Target Condition}
+\textit{Show that your matrix satisfies $w^T M w = 0$.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+Because every row of $B$ was chosen to be orthogonal to $w$, multiplying $B$ by $w$ gives:
+\[
+B w = \begin{bmatrix} v_1^T w \\ \vdots \\ v_{15}^T w \end{bmatrix} = \begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix} = \mathbf{0}
+\]
+This means $M w = B^T (B w) = B^T \mathbf{0} = \mathbf{0}$.
+
+Evaluating the quadratic form for the target vector gives:
+\[
+w^T M w = w^T (M w) = w^T \mathbf{0} = 0
+\]
+
+\vspace{0.8em}
+
+% --- Task B.5: Explain why Q(u) != 0 for all other nonzero binary vectors ---
+\subsubsection*{Task B.5: Nonzero Condition for Non-Target Binary Vectors}
+\textit{Explain why the quadratic form must be nonzero for every other nonzero binary vector.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+Using the transpose product rule, the quadratic form can be written as:
+\[
+u^T M u = u^T (B^T B) u = (B u)^T (B u) = \|B u\|^2
+\]
+Because $\|B u\|^2$ is a squared length, it is always $\ge 0$, and equals 0 if and only if $B u = \mathbf{0}$. The only vectors satisfying $B u = \mathbf{0}$ are scalar multiples of the target pattern, $u = c \cdot w$.
+
+Since $u$ is restricted to binary patterns ($0$ and $1$ only):
+\begin{itemize}
+    \item $c = 0 \implies u = \mathbf{0}$ (the all-white grid).
+    \item $c = 1 \implies u = w$ (the target pattern).
+\end{itemize}
+For any other nonzero binary vector $u \neq w$, $u$ is not a multiple of $w$, which means $B u \neq \mathbf{0}$. This guarantees that the score is strictly positive:
+\[
+u^T M u = \|B u\|^2 > 0 \neq 0
+\]
+
+\vspace{0.8em}
+
+% --- Task B.6: Symmetry and Invertibility ---
+\subsubsection*{Task B.6: Symmetry and Invertibility of $M$}
+\textit{State whether your matrix is symmetric and whether it is invertible. Justify your answers.}
+
+\vspace{0.4em}
+\textbf{Answer:}
+\begin{itemize}
+    \item \textbf{Symmetry: Yes.} Using the transpose product rule:
+    \[
+    M^T = (B^T B)^T = B^T (B^T)^T = B^T B = M
+    \]
+    Since $M^T = M$, matrix $M$ is symmetric.
+    \item \textbf{Invertibility: No.} From Task B.4, we know that $M w = \mathbf{0}$. Because matrix $M$ maps a nonzero vector ($w \neq \mathbf{0}$) to the zero vector, $w$ is a non-trivial vector in the nullspace of $M$. Therefore, $\det(M) = 0$, its rank is 15 (not full rank 16), and $M$ is not invertible.
+\end{itemize}
+
+\newpage
+
+% ===========================================================================
+\section*{Part C: Verify the Recognition Rule}
+% Assigned to: Member 2 (Ryan Kropac)
+% ===========================================================================
+
+% --- Task C.1: Systematic verification method ---
+\subsubsection*{Task C.1: Systematic Verification Methodology}
+\textit{Develop a systematic method to verify your matrix.}
+
+% [PLACEHOLDER FOR PART C.1: Member 2 describe Python testing script and mathematical checks]
+
+\vspace{0.5em}
+
+% --- Task C.2: Target vector verification ---
+\subsubsection*{Task C.2: Verification of the Target Vector}
+\textit{Verify the quadratic-form value for the target vector.}
+
+% [PLACEHOLDER FOR PART C.2: Show calculation w^T M w = 0]
+
+\vspace{0.5em}
+
+% --- Task C.3: Testing required sample patterns ---
+\subsubsection*{Task C.3: Testing on Required Binary Patterns}
+\textit{Test your matrix on several other binary patterns, including: a grid with only one blue cell, a grid with two blue cells, a grid with three blue cells in different positions, and the grid with all 16 cells blue.}
+
+% [PLACEHOLDER FOR PART C.3: Discuss individual test evaluations]
+
+\vspace{0.5em}
+
+% --- Task C.4: Explaining verification over all 65,535 vectors ---
+\subsubsection*{Task C.4: Exhaustive Verification of All $2^{16} - 1 = 65,535$ Nonzero Binary Vectors}
+\textit{Explain how you can verify the condition for all $2^{16} - 1 = 65,535$ nonzero binary vectors.}
+
+% [PLACEHOLDER FOR PART C.4: Explain Python script calculate.py checking all 65,536 combinations]
+
+\vspace{0.5em}
+
+% --- Task C.5: Table of 10 test patterns ---
+\subsubsection*{Task C.5: Table of Test Patterns and Values}
+\textit{Present a table of at least 10 test patterns, their binary vectors, and the corresponding quadratic-form values.}
+
+Table~\ref{tab:sample_patterns} presents the quadratic-form evaluation values generated by \texttt{calculate.py} for both Matrix $M$ (constructed via basis of $W^\perp$) and Matrix $N$ (constructed via orthogonal projection).
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cp{6.8cm}ccc}
+\toprule
+\textbf{\#} & \textbf{Description} & \textbf{Blue Cells} & $Q_M(u) = u^T M u$ & $Q_N(u) = u^T N u$ \\
+\midrule
+1 & Target pattern $w$ & 8 & 0 & 0 \\
+2 & Single blue cell (Cell 1, in $w$) & 1 & 7 & 7 \\
+3 & Single blue cell (Cell 3, not in $w$) & 1 & 1 & 8 \\
+4 & Two blue cells (Cells 1, 2, both in $w$) & 2 & 6 & 12 \\
+5 & Two blue cells (Cells 1 in $w$, 3 not in $w$) & 2 & 8 & 15 \\
+6 & Three blue cells (Row 1: 1, 2, 4 in $w$) & 3 & 5 & 15 \\
+7 & Three blue cells (Cells 3, 5, 6, none in $w$) & 3 & 3 & 24 \\
+8 & Four target cells (Cells 1, 2, 4, 7) & 4 & 4 & 16 \\
+9 & Inverted target ($1 - w$) & 8 & 8 & 64 \\
+10 & All 16 cells blue & 16 & 8 & 64 \\
+\bottomrule
+\end{tabular}
+\caption{Test patterns and quadratic-form evaluation values.}
+\label{tab:sample_patterns}
+\end{table}
+
+\vspace{0.5em}
+
+% --- Task C.6: Proving all nonzero binary patterns are satisfied ---
+\subsubsection*{Task C.6: Generality Beyond the Sample Table}
+\textit{State how you know that your construction satisfies the requirement for all nonzero binary patterns, not merely the patterns in your sample table.}
+
+% [PLACEHOLDER FOR PART C.6: Mathematical explanation connecting nullspace to Span{w}]
+
+\newpage
+
+% ===========================================================================
+\section*{Part D: Explore Different Matrix Constructions}
+% Assigned to: Member 3 (Mahanth Chintha)
+% ===========================================================================
+
+\subsection*{D.1: Construct a Second Matrix}
+
+% --- Task D.1.a: Find second matrix N ---
+\subsubsection*{Task D.1.a: Construction of Second Matrix $N$}
+\textit{Find a second $16 \times 16$ matrix $N$, different from your original matrix $M$, that recognizes the same target pattern.}
+
+% [PLACEHOLDER FOR PART D.1.a: Detail N = 8*I - w w^T from orthogonal projection]
+
+\vspace{0.5em}
+
+% --- Task D.1.b: Verify recognition conditions for N ---
+\subsubsection*{Task D.1.b: Verification of Conditions for Matrix $N$}
+\textit{Verify that $w^T N w = 0$ and $u^T N u \neq 0$ for every other nonzero binary vector $u \neq w$.}
+
+% [PLACEHOLDER FOR PART D.1.b: Show Cauchy-Schwarz or 8k - m^2 > 0 argument]
+
+\vspace{0.5em}
+
+% --- Task D.1.c: Comparison between M and N ---
+\subsubsection*{Task D.1.c: Comparison Between Matrices $M$ and $N$}
+\textit{Explain how the second matrix differs from the first and why both matrices work.}
+
+% [PLACEHOLDER FOR PART D.1.c: Contrast basis Gramian B^T B vs scaled projection 8I - w w^T]
+
+\vspace{1em}
+
+\subsection*{D.2: Investigate Matrix Structure}
+
+% --- Task D.2.a: Can matrix with off-diagonal entries work? ---
+\subsubsection*{Task D.2.a: Viability of Off-Diagonal Entries}
+\textit{Can a matrix with nonzero off-diagonal entries satisfy the requirements?}
+
+% [PLACEHOLDER FOR PART D.2.a: Explain that both M and N are non-diagonal]
+
+\vspace{0.5em}
+
+% --- Task D.2.b: Contribution of matrix entries to u^T M u ---
+\subsubsection*{Task D.2.b: Contribution of Matrix Entries to $u^T M u$}
+\textit{Explain how the entries of a matrix contribute to the value of $u^T M u$.}
+
+% [PLACEHOLDER FOR PART D.2.b: Expand u^T M u = sum M_ii u_i + sum_{i \neq j} M_ij u_i u_j]
+
+\vspace{0.5em}
+
+% --- Task D.2.c: Construct or describe non-diagonal matrix ---
+\subsubsection*{Task D.2.c: Construction/Description of Non-Diagonal Matrix}
+\textit{Construct or describe a non-diagonal matrix that satisfies the recognition condition, if possible.}
+
+% [PLACEHOLDER FOR PART D.2.c: Reference N = 8I - w w^T with off-diagonal entries -1]
+
+\newpage
+
+% ===========================================================================
+\section*{Part E: Reflection and Applications}
+% Assigned to: Group Collaboration (Led by Member 3)
+% ===========================================================================
+
+% Write a reflection of approximately 300-500 words addressing prompts (a) through (e).
+
+\subsubsection*{(a) Converting a Visual Grid into a Vector}
+\textit{How does converting a visual grid into a vector make mathematical analysis possible?}
+
+% [PLACEHOLDER: 1-2 paragraphs on vector spaces, linear transformations, coordinate geometry]
+
+\subsubsection*{(b) Challenges in Constructing the Matrix}
+\textit{What was the most challenging part of constructing the matrix?}
+
+% [PLACEHOLDER: 1-2 paragraphs on ensuring zero false positives across 65,535 combinations]
+
+\subsubsection*{(c) Verifying Pattern Uniqueness}
+\textit{How did you verify that the matrix recognizes only the target pattern?}
+
+% [PLACEHOLDER: 1 paragraph on combining mathematical nullspace proof with Python exhaustive search]
+
+\subsubsection*{(d) Importance of Systematic Verification}
+\textit{Why is systematic verification important in pattern recognition?}
+
+% [PLACEHOLDER: 1 paragraph on safety, edge cases, avoiding false positive matches]
+
+\subsubsection*{(e) Real-World Applications}
+\textit{How could a similar approach be used in image processing, data science, or another real-world application?}
+
+% [PLACEHOLDER: 1 paragraph on matched filters, facial recognition, convolution kernels, AI classification]
+
+\vspace{1.5em}
+
+% ===========================================================================
+% Note on Part F: Group Performance Evaluation
+% Per project instructions, Part F is an entirely confidential individual 
+% evaluation submitted independently by each group member. It is omitted 
+% from this joint technical report.
+% ===========================================================================
+
+\end{document}
