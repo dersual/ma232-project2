@@ -222,8 +222,6 @@ u^T M u = \|B u\|^2 > 0 \neq 0
 \vspace{0.4em}
 \textbf{Answer:} To verify our matrix \(M\), we first check that the target pattern produces \(Q(w)=0\). We then test other patterns to make sure they produce nonzero values. Finally, we use Python to check all 65,535 possible nonzero binary patterns and confirm that only the target produces zero.
 
-% [PLACEHOLDER FOR PART C.1: Member 2 describe Python testing script and mathematical checks]
-
 \vspace{0.5em}
 
 % --- Task C.2: Target vector verification ---
@@ -245,8 +243,6 @@ Since \(B\) was constructed so that \(Bw=0\), we get:
 Q(w)=0^T0=0
 \]
 Therefore, the target vector satisfies the recognition condition \(w^TMw=0\).
-
-% [PLACEHOLDER FOR PART C.2: Show calculation w^T M w = 0]
 
 \vspace{0.5em}
 
@@ -274,8 +270,6 @@ All 16 cells blue & 8 \\
 \end{center}
 All tested patterns produced nonzero values. This confirms that our matrix correctly rejects these patterns because none matches the target vector $w$.
 
-% [PLACEHOLDER FOR PART C.3: Discuss individual test evaluations]
-
 \vspace{0.5em}
 
 % --- Task C.4: Explaining verification over all 65,535 vectors ---
@@ -289,7 +283,6 @@ There are $2^{16} = 65,536$ possible binary vectors for a $4 \times 4$ grid. Exc
 We can use Python to generate every possible binary vector and calculate $Q(u) = u^T M u$ for each one. We then check that the target vector $w$ is the only nonzero vector that produces zero.
 
 This method allows us to verify every possible pattern rather than relying only on a few examples.
-% [PLACEHOLDER FOR PART C.4: Explain Python script calculate.py checking all 65,536 combinations]
 
 \vspace{0.5em}
 
@@ -297,7 +290,7 @@ This method allows us to verify every possible pattern rather than relying only 
 \subsubsection*{Task C.5: Table of Test Patterns and Values}
 \textit{Present a table of at least 10 test patterns, their binary vectors, and the corresponding quadratic-form values.}
 
-Table~\ref{tab:sample_patterns} presents the quadratic-form values calculated using matrix M for 10 different binary patterns
+Table~\ref{tab:sample_patterns} presents the quadratic-form values calculated using matrix $M$ for 10 different binary patterns.
 
 
 \begin{table}[H]
@@ -338,9 +331,6 @@ Therefore, $Q(u) = u^TMu = (Bu)^T(Bu) = 0$ only when $u$ is a multiple of $w$.
 Since we are only considering binary vectors, the only possible multiples are the zero vector and $w$ itself. The zero vector is excluded from the requirements.
 
 Therefore, $w$ is the only nonzero binary vector that produces zero, proving that our matrix works for all 65,535 nonzero patterns.
-
-
-% [PLACEHOLDER FOR PART C.6: Mathematical explanation connecting nullspace to Span{w}]
 
 \newpage
 
@@ -393,10 +383,7 @@ N = \begin{bmatrix}
 $}
 \end{center}
 
-
-% [PLACEHOLDER FOR PART D.1.a: Detail N = 8*I - w w^T from orthogonal projection]
-
-\vspace{0.5em}
+\newpage
 
 % --- Task D.1.b: Verify recognition conditions for N ---
 \subsubsection*{Task D.1.b: Verification of Conditions for Matrix $N$}
@@ -438,8 +425,6 @@ Therefore, every other nonzero binary vector
 produces a positive value, so $N$ satisfies
 the recognition conditions.
 
-% [PLACEHOLDER FOR PART D.1.b: Show Cauchy-Schwarz or 8k - m^2 > 0 argument]
-
 \vspace{0.5em}
 
 % --- Task D.1.c: Comparison between M and N ---
@@ -461,7 +446,6 @@ pattern.
 
 Therefore, both matrices successfully recognize
 the same target.
-% [PLACEHOLDER FOR PART D.1.c: Contrast basis Gramian B^T B vs scaled projection 8I - w w^T]
 
 \vspace{1em}
 
@@ -479,9 +463,6 @@ can satisfy the recognition conditions.
 In fact, both of our matrices $M$ and $N$ contain
 nonzero off-diagonal entries and successfully
 recognize the target pattern.
-
-
-% [PLACEHOLDER FOR PART D.2.a: Explain that both M and N are non-diagonal]
 
 \vspace{0.5em}
 
@@ -506,9 +487,6 @@ two different elements.
 For binary vectors, each element is either
 0 or 1. Therefore, off-diagonal terms contribute
 only when both corresponding cells are blue.
-
-
-% [PLACEHOLDER FOR PART D.2.b: Expand u^T M u = sum M_ii u_i + sum_{i \neq j} M_ij u_i u_j]
 
 \vspace{0.5em}
 
@@ -542,41 +520,25 @@ only for the target vector and the excluded
 zero vector. Therefore, a matrix does not need
 to be diagonal to recognize the target pattern.
 
-% [PLACEHOLDER FOR PART D.2.c: Reference N = 8I - w w^T with off-diagonal entries -1]
-
 \newpage
 
 % ===========================================================================
 \section*{Part E: Reflection and Applications}
-% Assigned to: Group Collaboration (Led by Member 3)
+% Assigned to: Group Collaboration (Led by Mahanth Chintha)
 % ===========================================================================
 
-% Write a reflection of approximately 300-500 words addressing prompts (a) through (e).
+\textit{Write a single cohesive reflection of approximately 300--500 words in continuous prose addressing the following topics (do not answer them as separate numbered questions):}
+\begin{itemize}
+    \item How converting a visual grid into a vector makes mathematical analysis possible.
+    \item The challenges faced in constructing the recognition matrix.
+    \item How pattern uniqueness was verified mathematically and computationally.
+    \item Why systematic verification is critical in pattern recognition.
+    \item Real-world applications of this approach (e.g., image processing, computer vision, data science).
+\end{itemize}
 
-\subsubsection*{(a) Converting a Visual Grid into a Vector}
-\textit{How does converting a visual grid into a vector make mathematical analysis possible?}
+\vspace{0.8em}
 
-% [PLACEHOLDER: 1-2 paragraphs on vector spaces, linear transformations, coordinate geometry]
-
-\subsubsection*{(b) Challenges in Constructing the Matrix}
-\textit{What was the most challenging part of constructing the matrix?}
-
-% [PLACEHOLDER: 1-2 paragraphs on ensuring zero false positives across 65,535 combinations]
-
-\subsubsection*{(c) Verifying Pattern Uniqueness}
-\textit{How did you verify that the matrix recognizes only the target pattern?}
-
-% [PLACEHOLDER: 1 paragraph on combining mathematical nullspace proof with Python exhaustive search]
-
-\subsubsection*{(d) Importance of Systematic Verification}
-\textit{Why is systematic verification important in pattern recognition?}
-
-% [PLACEHOLDER: 1 paragraph on safety, edge cases, avoiding false positive matches]
-
-\subsubsection*{(e) Real-World Applications}
-\textit{How could a similar approach be used in image processing, data science, or another real-world application?}
-
-% [PLACEHOLDER: 1 paragraph on matched filters, facial recognition, convolution kernels, AI classification]
+% [PLACEHOLDER: Insert Mahanth's 300-500 word reflection here]
 
 \vspace{1.5em}
 
