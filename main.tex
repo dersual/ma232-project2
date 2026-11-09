@@ -538,7 +538,16 @@ to be diagonal to recognize the target pattern.
 
 \vspace{0.8em}
 
-% [PLACEHOLDER: Insert Mahanth's 300-500 word reflection here]
+This project asked us to teach a computer to recognize a pattern using linear algebra. We began by converting a $4\times4$ grid of blue and white squares into a vector. We created this vector by reading the grid row by row and representing each blue cell as $1$ and each white cell as $0$. By doing so, we created a vector in $\mathbb{R}^{16}$. This allowed us to use matrices and dot products to determine whether a test pattern matched our target pattern. We also found that there are $2^{16}=65{,}536$ possible patterns that could all be analyzed using a similar approach.
+
+The hardest part of this project was constructing the recognition matrix. We needed a matrix $M$ such that $w^TMw=0$ for our target pattern, while producing a positive value for all other nonzero binary vectors. Although we initially struggled to satisfy both conditions at once, we came to a conclusion. Our solution was to construct $M=B^TB$, where the rows of $B$ are perpendicular to $w$. This ensures that $Bw=0$, and it also transforms the quadratic form into $\|Bu\|^2$. This guarantees a nonnegative value since a squared length can never be negative. This approach also helped us prove that the target was unique. Since $Q(u)=0$ only when $Bu=0$, $u$ must be a multiple of $w$. Because our vectors contain only $0$s and $1$s, the only possibilities are the zero vector and our target $w$.
+
+In order to verify our results, we tested multiple patterns. These patterns included the single blue cells, the inverted target, and the all-blue grid. We also wrote a Python program to check all $65{,}535$ nonzero binary patterns. Additionally, we constructed a second recognition matrix, $N=8I-ww^T$. This demonstrated that multiple matrices can satisfy the same requirements. One important lesson we learned was that testing a few examples does not automatically prove a method works. A matrix might pass ten tests but fail on the eleventh. As a result, we combined mathematical proofs with computational verification, giving us greater confidence in our results.
+
+This project also showed us how linear algebra can be applied to pattern recognition. In real systems, incorrectly identifying or missing a pattern could lead to serious problems, making accuracy and precision essential. Similar pattern recognition concepts appear in real-world applications such as image processing, computer vision, and data science, where images and other information are converted into vectors and compared against known patterns.
+
+Although our $4\times4$ grid was a simplified example, it demonstrated the same fundamental idea: representing visual information mathematically allows individuals to use matrices to recognize patterns reliably.
+
 
 \vspace{1.5em}
 
